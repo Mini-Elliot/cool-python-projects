@@ -1,199 +1,239 @@
-import pygame, random, sys, json, heapq, hashlib
-pygame.init()
+import json, os, sys, random, math, hashlib
 
-WIDTH, HEIGHT = 960, 720
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Hack of 5/9")
-CLOCK = pygame.time.Clock()
-FONT = pygame.font.SysFont("arial", 20)
+SAVE_FILE = "save.json"
+LEADERBOARD_FILE = "leaderboard.json"
 
-WHITE=(255,255,255);BLACK=(0,0,0);GREEN=(50,200,50);RED=(200,50,50);BLUE=(50,50,200);YELLOW=(255,255,0);ORANGE=(255,165,0)
 
-SAVE_FILE="save.json"
-PASSWORD_FILE="hacked_password.json"
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
 
-# ===================== SAVE / LOAD =====================
-def save_game(data):
-    with open(SAVE_FILE,"w") as f: json.dump(data,f)
 
-def load_game():
-    try:
-        with open(SAVE_FILE,"r") as f: return json.load(f)
-    except:
-        return {"level":1,"score":0,"currency":0}
+# ===================== LEADERBOARD =====================
 
-def save_password(password,code):
-    with open(PASSWORD_FILE,"w") as f: json.dump({"password":password,"code":code},f)
+class Leaderboard:
+    def __init__(self, file=LEADERBOARD_FILE):
+        self.file = file
+        self.entries = self.load()
 
-def load_password():
-    try:
-        with open(PASSWORD_FILE,"r") as f: return json.load(f)
-    except:
-        return None
+    def load(self):
+        if os.path.exists(self.file):
+            with open(self.file) as f:
+                return json.load(f)
+        return []
 
-def simple_hash(word):
-    return hashlib.sha256(word.encode()).hexdigest()[:6]
+    def add(self, name, level):
+        self.entries.append({"name": name, "level": level})
+        self.entries = sorted(self.entries, key=lambda x: x["level"], reverse=True)[:10]
+        with open(self.file, "w") as f:
+            json.dump(self.entries, f, indent=4)
 
-# ===================== HACKING GAME =====================
-def hacking_game():
-    words=["robot","fsociety","elliot","darkarmy","whiterose"]
-    password=random.choice(words)
-    hash_val=simple_hash(password)
-    step=1
-    user_input=""
-    timer=600
-    code=random.randint(1000,9999)
+    def show(self):
+        print("\n=== LEADERBOARD ===")
+        for i, e in enumerate(self.entries, 1):
+            print(f"{i}. {e['name']} — Level {e['level']}")
 
-    while True:
-        CLOCK.tick(30);WIN.fill(BLACK)
 
-        if step==1:
-            WIN.blit(FONT.render(f"Crack this hash: {hash_val}",True,WHITE),(250,250))
-            WIN.blit(FONT.render(f"Type password guess: {user_input}",True,GREEN),(250,300))
-        elif step==2:
-            WIN.blit(FONT.render(f"Password correct! Retrieved file with code {code}",True,WHITE),(180,250))
-            WIN.blit(FONT.render("Remember this code! Press ENTER to finish.",True,GREEN),(180,300))
+# ===================== SKILLS =====================
 
-        pygame.display.update()
+class SkillTree:
+    def __init__(self):
+        self.hacking = 0
+        self.combat = 0
+        self.stealth = 0
 
-        for e in pygame.event.get():
-            if e.type==pygame.QUIT:
-                pygame.quit();sys.exit()
-            if e.type==pygame.KEYDOWN:
-                if step==1:
-                    if e.key==pygame.K_RETURN:
-                        if user_input==password:
-                            step=2
-                            save_password(password,code)
-                            user_input=""
-                        else:
-                            user_input=""
-                    elif e.key==pygame.K_BACKSPACE:
-                        user_input=user_input[:-1]
-                    elif e.unicode.isalpha():
-                        user_input+=e.unicode
-                elif step==2 and e.key==pygame.K_RETURN:
-                    return True
+    def upgrade(self, skill):
+        if hasattr(self, skill):
+            setattr(self, skill, getattr(self, skill) + 1)
 
-        timer-=1
-        if timer<=0:
-            return False
-
-# ===================== A* PATHFINDING =====================
-class Node:
-    def __init__(self,x,y):
-        self.x=x;self.y=y;self.g=self.h=self.f=0;self.parent=None
-    def __lt__(self,o): return self.f<o.f
-
-def astar(start,end,obstacles,grid_size=40):
-    start_node,end_node=Node(*start),Node(*end)
-    open_list,closed=[],[]
-    heapq.heappush(open_list,(0,start_node))
-    while open_list:
-        _,curr=heapq.heappop(open_list)
-        closed.append(curr)
-        if (curr.x,curr.y)==(end_node.x,end_node.y):
-            path=[]
-            while curr:
-                path.append((curr.x,curr.y));curr=curr.parent
-            return path[::-1]
-        for dx,dy in [(0,1),(1,0),(-1,0),(0,-1)]:
-            nx,ny=curr.x+dx,curr.y+dy
-            if nx<0 or ny<0 or nx>=WIDTH//grid_size or ny>=HEIGHT//grid_size: continue
-            if any(abs(nx*grid_size-ox)<40 and abs(ny*grid_size-oy)<40 for ox,oy,_,_ in obstacles): continue
-            node=Node(nx,ny)
-            if any(c.x==nx and c.y==ny for c in closed): continue
-            node.g=curr.g+1;node.h=abs(nx-end_node.x)+abs(ny-end_node.y);node.f=node.g+node.h;node.parent=curr
-            if not any(o[1].x==nx and o[1].y==ny for o in open_list): heapq.heappush(open_list,(node.f,node))
-    return []
-
-# ===================== INVENTORY =====================
-class Inventory:
-    def __init__(self): self.items={"metal":0,"crystal":0}
-    def add(self,item): self.items[item]=self.items.get(item,0)+1
-    def craft(self):
-        if self.items["metal"]>=2 and self.items["crystal"]>=1:
-            self.items["metal"]-=2;self.items["crystal"]-=1
-            return "super"
-        return None
 
 # ===================== PLAYER =====================
+
 class Player:
-    def __init__(self):
-        self.x,self.y=WIDTH//2,HEIGHT-60;self.size=35;self.speed=5
-        self.health=100;self.weapon="single";self.bullets=[]
-        self.score=0;self.currency=0;self.inventory=Inventory()
-    def draw(self):
-        pygame.draw.rect(WIN,BLUE,(self.x,self.y,self.size,self.size))
-        for b in self.bullets: pygame.draw.rect(WIN,YELLOW,(b[0],b[1],6,12))
-    def move(self,keys):
-        if keys[pygame.K_LEFT] and self.x>0:self.x-=self.speed
-        if keys[pygame.K_RIGHT] and self.x<WIDTH-self.size:self.x+=self.speed
-        if keys[pygame.K_UP] and self.y>0:self.y-=self.speed
-        if keys[pygame.K_DOWN] and self.y<HEIGHT-self.size:self.y+=self.speed
-    def shoot(self):
-        offs=[(self.size//2,0)] if self.weapon=="single" else [(5,0),(self.size-10,0)]
-        if self.weapon=="super": offs+=[(self.size//2,0)]
-        for ox,oy in offs:self.bullets.append([self.x+ox,self.y])
-    def update_bullets(self):
-        for b in self.bullets: b[1]-=9
-        self.bullets=[b for b in self.bullets if b[1]>0]
+    def __init__(self, name):
+        self.name = name
+        self.max_hp = 100
+        self.hp = self.max_hp
+        self.lives = 3
+        self.level = 1
+        self.score = 0
+        self.credits = 0
+        self.detection = 0
+        self.skills = SkillTree()
+
+    def alive(self):
+        return self.hp > 0
+
+    def lose_life(self):
+        self.lives -= 1
+        self.reset_after_death()
+
+    def reset_after_death(self):
+        self.hp = self.max_hp
+        self.detection = 0
+
 
 # ===================== ENEMY =====================
+
 class Enemy:
-    def __init__(self,obstacles,is_boss=False):
-        self.grid=40;self.x=random.randint(0,WIDTH-30);self.y=random.randint(-150,-40)
-        self.size=60 if is_boss else 30
-        self.health=50 if is_boss else 10
-        self.is_boss=is_boss
-        self.path=[];self.obstacles=obstacles
-    def draw(self): pygame.draw.rect(WIN,RED,(self.x,self.y,self.size,self.size))
-    def move(self,target):
-        if not self.path or random.random()<0.02:
-            sx,sy=self.x//self.grid,self.y//self.grid;tx,ty=target.x//self.grid,target.y//self.grid
-            self.path=astar((sx,sy),(tx,ty),self.obstacles,self.grid)
-        if self.path:
-            nx,ny=self.path[0];tx,ty=nx*self.grid,ny*self.grid
-            if abs(self.x-tx)<3 and abs(self.y-ty)<3:self.path.pop(0)
+    def __init__(self, level):
+        self.is_boss = level % 5 == 0
+        base = 30 + level * 8
+        self.hp = base * (2 if self.is_boss else 1)
+        self.damage = 8 + level * 2
+
+
+# ===================== HACKING =====================
+
+class HackPuzzle:
+    @staticmethod
+    def domain():
+        return random.choice(["prime", "fibonacci", "pi", "e"])
+
+    @staticmethod
+    def generate(domain):
+        if domain == "prime":
+            return random.choice(
+                [x for x in range(2, 200) if all(x % p for p in range(2, int(x**0.5)+1))]
+            )
+        if domain == "fibonacci":
+            seq = [1, 1]
+            while seq[-1] < 200:
+                seq.append(seq[-1] + seq[-2])
+            return random.choice(seq)
+        if domain == "pi":
+            return int(str(math.pi)[2:6])
+        if domain == "e":
+            return int(str(math.e)[2:6])
+
+    @staticmethod
+    def play(player):
+        domain = HackPuzzle.domain()
+        secret = HackPuzzle.generate(domain)
+        low, high = 1, 200
+        attempts = max(3, 6 - player.skills.hacking)
+
+        print(f"\nHACK MODE — {domain.upper()}")
+        print("Binary search recommended.")
+
+        for _ in range(attempts):
+            try:
+                guess = int(input(f"[{low}-{high}] Guess: "))
+            except:
+                player.detection += 10
+                continue
+
+            if guess == secret:
+                print("Hack successful.")
+                return True
+
+            player.detection += 5
+            if guess < secret:
+                low = guess + 1
+                print("Too low.")
             else:
-                self.x+=(tx-self.x)*0.05;self.y+=(ty-self.y)*0.05
+                high = guess - 1
+                print("Too high.")
 
-# ===================== MAIN LOOP =====================
-def main():
-    data=load_game();level=data["level"];player=Player()
-    enemies=[];obstacles=[(random.randint(50,WIDTH-50),random.randint(100,HEIGHT-150),40,20) for _ in range(8)]
-    spawn_timer=0
+            print(f"Hint: midpoint ≈ {(low + high) // 2}")
 
-    while True:
-        CLOCK.tick(60);WIN.fill(BLACK);keys=pygame.key.get_pressed()
-        for e in pygame.event.get():
-            if e.type==pygame.QUIT:pygame.quit();sys.exit()
-            if e.type==pygame.KEYDOWN:
-                if e.key==pygame.K_SPACE:player.shoot()
-                if e.key==pygame.K_s:save_game({"level":level,"score":player.score,"currency":player.currency})
+        print("Hack failed.")
+        return False
 
-        if level==3:
-            if hacking_game(): level+=1
-        else:
-            spawn_timer+=1
-            if spawn_timer>max(20,60-level*4):
-                boss=(level in [5,10]) and len(enemies)==0
-                enemies.append(Enemy(obstacles,is_boss=boss));spawn_timer=0
 
-            player.move(keys);player.update_bullets();player.draw()
+# ===================== COMBAT =====================
 
-            for en in enemies[:]:
-                en.move(player);en.draw()
-                for b in player.bullets:
-                    if en.x<b[0]<en.x+en.size and en.y<b[1]<en.y+en.size:
-                        if b in player.bullets:player.bullets.remove(b)
-                        en.health-=10
-                        if en.health<=0:
-                            enemies.remove(en);player.score+=10;player.currency+=5
-                            if len(enemies)==0 and (level<10): level+=1
+class CombatSystem:
+    @staticmethod
+    def engage(player):
+        enemy = Enemy(player.level)
 
-        WIN.blit(FONT.render(f"Level:{level} Score:{player.score} Curr:{player.currency}",True,WHITE),(10,10))
-        WIN.blit(FONT.render("Press S to Save",True,ORANGE),(10,40))
-        pygame.display.update()
+        print("\n⚠ ENCOUNTER ⚠")
+        if enemy.is_boss:
+            print("BOSS DETECTED.")
 
-main()
+        while enemy.hp > 0 and player.alive():
+            print(f"\nHP: {player.hp} | Lives: {player.lives} | Detection: {player.detection}")
+            action = input("[attack / hack / flee]: ").lower()
+
+            if action == "attack":
+                dmg = random.randint(10, 18) + player.skills.combat * 2
+                enemy.hp -= dmg
+                print(f"You dealt {dmg} damage.")
+
+            elif action == "hack":
+                if HackPuzzle.play(player):
+                    enemy.hp = 0
+                else:
+                    player.detection += 10
+
+            elif action == "flee":
+                player.hp -= 20
+                print("You escaped, but lost HP.")
+                return
+
+            enemy_hit = enemy.damage + random.randint(0, 6)
+            player.hp -= enemy_hit
+            print(f"Enemy hit for {enemy_hit}.")
+
+            if player.detection >= 100:
+                print("TRACE COMPLETE.")
+                player.hp = 0
+
+        if player.alive():
+            print("Enemy defeated.")
+            player.score += 50
+            player.credits += 20
+            player.level += 1
+
+
+# ===================== GAME =====================
+
+class Game:
+    def __init__(self):
+        clear()
+        self.player = Player(input("Enter your alias: ") or "Anonymous")
+        self.leaderboard = Leaderboard()
+
+    def run(self):
+        while self.player.lives > 0:
+            CombatSystem.engage(self.player)
+
+            if not self.player.alive():
+                self.player.lose_life()
+                if self.player.lives == 0:
+                    break
+                print(f"\nYou lost a life. Lives remaining: {self.player.lives}")
+                input("Press ENTER to continue...")
+                clear()
+                continue
+
+            print("\nUpgrade skill?")
+            print("1. Hacking  2. Combat  3. Stealth  0. Skip")
+            choice = input("> ")
+
+            if choice == "1":
+                self.player.skills.upgrade("hacking")
+            elif choice == "2":
+                self.player.skills.upgrade("combat")
+            elif choice == "3":
+                self.player.skills.upgrade("stealth")
+
+        self.game_over()
+
+    def game_over(self):
+        clear()
+        print("PERMADEATH.")
+        print(f"Alias: {self.player.name}")
+        print(f"Level reached: {self.player.level}")
+        self.leaderboard.add(self.player.name, self.player.level)
+        self.leaderboard.show()
+        sys.exit()
+
+
+# ===================== ENTRY =====================
+
+if __name__ == "__main__":
+    try:
+        Game().run()
+    except KeyboardInterrupt:
+        print("\nDisconnected.")
