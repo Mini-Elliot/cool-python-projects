@@ -1,31 +1,69 @@
-def get_input(word):
-    user_input = input(f"Enter a {word} >> ")
-    return user_input
+import random
 
-def story():
-    noun1 = get_input("Noun 1")
-    noun2 = get_input("Noun 2")
-    verb1 = get_input("Verb 1")
-    verb2 = get_input("Verb 2")
-    adj1 = get_input("Adjective 1")
-    adj2 = get_input("Adjective 2")
-    adj3 = get_input("Adjective 3")
+def get_input(prompt):
+    while True:
+        value = input(f"Enter a {prompt}: ").strip()
+        if value:
+            return value.lower()
+        print("Input cannot be empty.")
 
-    story = f"""
-    One sunny morning, a {adj1} {noun1} woke up with an unstoppable urge to {verb1}. 
-    Without thinking twice, the {adj1} {noun1} started {verb1}ing everywhere—on the table, 
-    on the floor, and even in places where {verb1}ing absolutely made no sense at all.
+def verb_ing(verb):
+    if verb.endswith("e") and verb != "be":
+        return verb[:-1] + "ing"
+    if len(verb) >= 3 and verb[-1] not in "aeiou" and verb[-2] in "aeiou":
+        return verb + verb[-1] + "ing"
+    return verb + "ing"
 
-    Suddenly, a {adj2} {noun2} appeared, stared for a moment, and decided that this was 
-    way too weird to ignore. Instead of asking questions, the {adj2} {noun2} joined in, 
-    and together they went off to {verb2} like two {adj3} friends on the strangest adventure ever.
+def collect_words():
+    prompts = {
+        "noun1": "noun",
+        "noun2": "noun",
+        "verb1": "verb",
+        "verb2": "verb",
+        "adj1": "adjective",
+        "adj2": "adjective",
+        "adj3": "adjective"
+    }
 
-    And that’s how a {adj1} {noun1} and a {adj2} {noun2} accidentally became 
-    {adj3} legends of {verb2}ing.
-    """
+    return {key: get_input(value) for key, value in prompts.items()}
 
-    print(story)
+def generate_story(words):
+    templates = [
+        f"""
+One sunny morning, a {words['adj1']} {words['noun1']} woke up with an unstoppable urge to {words['verb1']}.
+Without thinking twice, the {words['noun1']} started {verb_ing(words['verb1'])} everywhere—
+on the table, on the floor, and in places where it absolutely shouldn’t.
 
+Suddenly, a {words['adj2']} {words['noun2']} appeared.
+After a long stare, it shrugged and joined in.
+Soon, both of them were {verb_ing(words['verb2'])} like two {words['adj3']} legends.
+
+History would never forget that day.
+""",
+
+        f"""
+The {words['adj1']} {words['noun1']} was known across the land for one thing: {verb_ing(words['verb1'])}.
+No one questioned it—until a {words['adj2']} {words['noun2']} showed up.
+
+Instead of stopping the chaos, the two teamed up and went off {verb_ing(words['verb2'])}.
+Some called them foolish. Others called them {words['adj3']}.
+
+They preferred the word “iconic.”
+"""
+    ]
+
+    return random.choice(templates)
+
+def play():
+    while True:
+        words = collect_words()
+        story_text = generate_story(words)
+        print(story_text)
+
+        again = input("Play again? (y/n): ").strip().lower()
+        if again != "y":
+            print("Goodbye.")
+            break
 
 if __name__ == "__main__":
-    story()
+    play()

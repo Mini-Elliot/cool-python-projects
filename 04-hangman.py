@@ -3,7 +3,7 @@ import subprocess
 
 def run_game():
     while True:
-        word: str = choice(["apple", "secret", "banana"])
+        word: str = choice(["apple", "secret", "banana", "tomato", "chicken"])
 
         user_name: str = input("What is your name? >> ")
         print(f"Welcome to hangman, {user_name}")
@@ -23,7 +23,7 @@ def run_game():
                 else:
                     print("_", end="")
                     blanks+=1
-        
+
             print("") # This adds a blank line
 
             if blanks == 0:
@@ -45,7 +45,7 @@ def run_game():
                 if tries == 0:
                     print("No more tries remaining. You lose!")
                     break
-                
+
         user_choice: str = input("Do you want to play again? (y/n) ").strip().lower()
         if user_choice == "y":
             subprocess.call("cls", shell=True)
