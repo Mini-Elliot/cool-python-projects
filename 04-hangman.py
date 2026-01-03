@@ -1,62 +1,137 @@
 from random import choice
-import subprocess
+import os
+import string
+
+WORDS = ["apple", "secret", "banana", "tomato", "chicken"]
+
+HANGMAN_STAGES = [
+    """
+     -----
+     |   |
+         |
+         |
+         |
+         |
+    --------
+    """,
+    """
+     -----
+     |   |
+     O   |
+         |
+         |
+         |
+    --------
+    """,
+    """
+     -----
+     |   |
+     O   |
+     |   |
+         |
+         |
+    --------
+    """,
+    """
+     -----
+     |   |
+     O   |
+    /|   |
+         |
+         |
+    --------
+    """,
+    """
+     -----
+     |   |
+     O   |
+    /|\\  |
+         |
+         |
+    --------
+    """,
+    """
+     -----
+     |   |
+     O   |
+    /|\\  |
+    /    |
+         |
+    --------
+    """,
+    """
+     -----
+     |   |
+     O   |
+    /|\\  |
+    / \\  |
+         |
+    --------
+    """
+]
+
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
+
 
 def run_game():
     while True:
-        word: str = choice(["apple", "secret", "banana", "tomato", "chicken"])
+        clear_screen()
+        word = choice(WORDS).lower()
+        guessed_letters = set()
+        wrong_guesses = 0
+        max_wrong = len(HANGMAN_STAGES) - 1
 
-        user_name: str = input("What is your name? >> ")
-        print(f"Welcome to hangman, {user_name}")
+        name = input("What is your name? >> ").strip()
+        clear_screen()
+        print(f"Welcome to Hangman, {name}\n")
 
-        #setup
-        guessed: str = ''
-        tries: int = 3
+        while True:
+            clear_screen()
+            print(HANGMAN_STAGES[wrong_guesses])
 
-        #game
-        while tries > 0:
-            blanks: int = 0
+            # Display word
+            display_word = " ".join(
+                char if char in guessed_letters else "_"
+                for char in word
+            )
+            print("Word:", display_word)
+            print("\nGuessed letters:", " ".join(sorted(guessed_letters)))
 
-            print("Word: ", end='')
-            for char in word:
-                if char in guessed:
-                    print(char, end="")
-                else:
-                    print("_", end="")
-                    blanks+=1
-
-            print("") # This adds a blank line
-
-            if blanks == 0:
-                print('You got it')
+            # Win condition
+            if all(char in guessed_letters for char in word):
+                print("\nYou won! 🎉")
                 break
 
-            guess: str = input("Enter a letter: ")
+            # Lose condition
+            if wrong_guesses == max_wrong:
+                print(f"\nYou lost! The word was: {word}")
+                break
 
-            if guess in guessed:
-                print(f"You already used: {guess}. Please try with another letter.")
+            guess = input("\nEnter a letter: ").lower().strip()
+
+            if len(guess) != 1 or guess not in string.ascii_lowercase:
+                print("Enter a single alphabetic character.")
+                input("Press Enter to continue...")
                 continue
 
-            guessed += guess
+            if guess in guessed_letters:
+                print("You already guessed that letter.")
+                input("Press Enter to continue...")
+                continue
 
-            if guess not in guessed:
-                tries-=1
-                print(f"Sorry, that was wrong... (tries remaining: {tries})")
+            guessed_letters.add(guess)
 
-                if tries == 0:
-                    print("No more tries remaining. You lose!")
-                    break
+            if guess not in word:
+                wrong_guesses += 1
 
-        user_choice: str = input("Do you want to play again? (y/n) ").strip().lower()
-        if user_choice == "y":
-            subprocess.call("cls", shell=True)
-            continue
-        elif user_choice == "n":
-            subprocess.call("cls", shell=True)
-            print("Thank you for playing! 😊")
+        choice_again = input("\nPlay again? (y/n): ").lower().strip()
+        if choice_again != "y":
+            clear_screen()
+            print("Thank you for playing.")
             break
-        else:
-            print('Enter a valid choice.')
-            break
+
 
 if __name__ == "__main__":
     run_game()
