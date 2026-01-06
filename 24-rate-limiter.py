@@ -1,143 +1,203 @@
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass
+from enum import Enum
 
 
-# -------------------- RATE LIMITERS --------------------
+# -------------------- CONFIG --------------------
+
+USER_CAPACITY = 5
+USER_RATE = 1
+
+GLOBAL_CAPACITY = 20
+GLOBAL_RATE = 5
+
+BAN_THRESHOLD = 0.6       # reject rate
+BAN_DURATION = 10         # seconds
+WINDOW_SECONDS = 30
+
+
+# -------------------- ALGORITHMS --------------------
+
+class Algo(Enum):
+    TOKEN = "token"
+    LEAKY = "leaky"
+
 
 class TokenBucket:
-    def __init__(self, capacity, refill_rate):
+    def __init__(self, capacity, rate):
         self.capacity = capacity
         self.tokens = capacity
-        self.refill_rate = refill_rate
-        self.last_refill = time.time()
-
-    def refill(self):
-        now = time.time()
-        elapsed = now - self.last_refill
-        added = elapsed * self.refill_rate
-        if added > 0:
-            self.tokens = min(self.capacity, self.tokens + added)
-            self.last_refill = now
+        self.rate = rate
+        self.last = time.time()
 
     def allow(self):
-        self.refill()
+        now = time.time()
+        self.tokens = min(
+            self.capacity,
+            self.tokens + (now - self.last) * self.rate
+        )
+        self.last = now
+
         if self.tokens >= 1:
             self.tokens -= 1
             return True, 0.0
-        retry_after = (1 - self.tokens) / self.refill_rate
-        return False, max(retry_after, 0.0)
+        return False, (1 - self.tokens) / self.rate
 
 
 class LeakyBucket:
-    def __init__(self, capacity, leak_rate):
+    def __init__(self, capacity, rate):
         self.capacity = capacity
         self.queue = deque()
-        self.leak_rate = leak_rate
-        self.last_leak = time.time()
+        self.rate = rate
+        self.last = time.time()
 
-    def leak(self):
+    def allow(self):
         now = time.time()
-        elapsed = now - self.last_leak
-        leaked = int(elapsed * self.leak_rate)
+        leaked = int((now - self.last) * self.rate)
 
         for _ in range(min(leaked, len(self.queue))):
             self.queue.popleft()
 
-        if leaked > 0:
-            self.last_leak = now
+        if leaked:
+            self.last = now
 
-    def allow(self):
-        self.leak()
         if len(self.queue) < self.capacity:
-            self.queue.append(time.time())
+            self.queue.append(now)
             return True, 0.0
 
-        retry_after = 1 / self.leak_rate
-        return False, retry_after
+        return False, 1 / self.rate
 
 
 # -------------------- LOGGING --------------------
 
 @dataclass
-class LogEntry:
-    timestamp: float
+class Log:
+    ts: float
     user: str
     allowed: bool
-    retry_after: float
+    reason: str
 
 
-logs = []
+logs = deque(maxlen=1000)
 
 
-# -------------------- MAIN APP --------------------
+# -------------------- STATE --------------------
+
+user_buckets = {}
+user_bans = {}
+user_windows = defaultdict(deque)
+
+global_bucket = TokenBucket(GLOBAL_CAPACITY, GLOBAL_RATE)
+
+
+# -------------------- HELPERS --------------------
+
+def is_banned(user):
+    return user in user_bans and time.time() < user_bans[user]
+
+
+def sliding_stats(user):
+    now = time.time()
+    window = user_windows[user]
+
+    while window and now - window[0][0] > WINDOW_SECONDS:
+        window.popleft()
+
+    if not window:
+        return 0, 0
+
+    allowed = sum(1 for _, ok in window if ok)
+    rejected = len(window) - allowed
+    return allowed, rejected
+
+
+def maybe_ban(user):
+    allowed, rejected = sliding_stats(user)
+    total = allowed + rejected
+    if total >= 5 and rejected / total >= BAN_THRESHOLD:
+        user_bans[user] = time.time() + BAN_DURATION
+        print(f"[BAN] user={user} for {BAN_DURATION}s")
+
+
+# -------------------- MAIN --------------------
 
 def main():
-    print("Rate Limiter Simulator (Real Version)")
-    print("Type: user_id to make request, or 'exit'")
+    print("Advanced Rate Limiter Simulator")
+    algo = input("Choose algorithm (token/leaky): ").strip().lower()
 
-    algorithm = input("Choose algorithm (token/leaky): ").strip().lower()
-    if algorithm not in {"token", "leaky"}:
+    if algo not in {"token", "leaky"}:
         print("Invalid algorithm.")
         return
 
-    buckets = {}
+    algo = Algo(algo)
 
     while True:
-        user_input = input("> ").strip()
-        if user_input == "exit":
+        user = input("> ").strip()
+        if user == "exit":
             break
 
-        user_id = user_input
+        now = time.time()
 
-        if user_id not in buckets:
-            if algorithm == "token":
-                buckets[user_id] = TokenBucket(capacity=5, refill_rate=1)
-            else:
-                buckets[user_id] = LeakyBucket(capacity=5, leak_rate=1)
+        if is_banned(user):
+            print(f"[BANNED] user={user}")
+            logs.append(Log(now, user, False, "banned"))
+            continue
 
-        bucket = buckets[user_id]
-        allowed, retry_after = bucket.allow()
+        if not global_bucket.allow()[0]:
+            print("[GLOBAL LIMIT]")
+            logs.append(Log(now, user, False, "global"))
+            continue
 
-        logs.append(
-            LogEntry(time.time(), user_id, allowed, retry_after)
-        )
+        if user not in user_buckets:
+            bucket = TokenBucket(USER_CAPACITY, USER_RATE) \
+                if algo == Algo.TOKEN else \
+                LeakyBucket(USER_CAPACITY, USER_RATE)
+            user_buckets[user] = bucket
+
+        allowed, _ = user_buckets[user].allow()
+        user_windows[user].append((now, allowed))
 
         if allowed:
-            print(f"[ALLOWED] user={user_id}")
+            print(f"[OK] user={user}")
+            logs.append(Log(now, user, True, "ok"))
         else:
-            print(f"[REJECTED] user={user_id} retry_after={retry_after:.2f}s")
+            print(f"[RATE LIMITED] user={user}")
+            logs.append(Log(now, user, False, "user-limit"))
+            maybe_ban(user)
 
-    analyze_logs()
+    analyze()
 
 
 # -------------------- ANALYSIS --------------------
 
-def analyze_logs():
-    print("\n=== Request Analysis ===")
+def analyze():
+    print("\n=== FINAL ANALYSIS ===")
 
-    per_user = defaultdict(lambda: {"allowed": 0, "rejected": 0})
+    per_user = defaultdict(lambda: {"ok": 0, "reject": 0})
 
-    for entry in logs:
-        if entry.allowed:
-            per_user[entry.user]["allowed"] += 1
+    for l in logs:
+        if l.allowed:
+            per_user[l.user]["ok"] += 1
         else:
-            per_user[entry.user]["rejected"] += 1
+            per_user[l.user]["reject"] += 1
 
-    for user, stats in per_user.items():
-        total = stats["allowed"] + stats["rejected"]
-        reject_rate = stats["rejected"] / total if total else 0
+    for user, s in per_user.items():
+        total = s["ok"] + s["reject"]
+        rate = s["reject"] / total if total else 0
         print(
             f"user={user} "
-            f"allowed={stats['allowed']} "
-            f"rejected={stats['rejected']} "
-            f"reject_rate={reject_rate:.2%}"
+            f"ok={s['ok']} "
+            f"reject={s['reject']} "
+            f"reject_rate={rate:.1%}"
         )
 
-    print("\nInterpretation:")
-    print("- Token bucket allows bursts, then recovers.")
-    print("- Leaky bucket smooths traffic, rejects bursts.")
-    print("- Per-user isolation prevents noisy neighbors.")
+    print("\nKey Observations:")
+    print("- Token bucket absorbs bursts.")
+    print("- Leaky bucket enforces smooth flow.")
+    print("- Sliding windows detect sustained abuse.")
+    print("- Temporary bans protect system health.")
+    print("- Global limit prevents total collapse.")
 
 
 if __name__ == "__main__":
