@@ -32,7 +32,7 @@ def main():
         url_to_mp3(video_url=input_url)
         print("Finished Downloading!")
     except Exception as e:
-        print(f"Error occured: {e}")
+        print(f"Error occurred: {e}")
 
 if __name__ == "__main__":
     main()
