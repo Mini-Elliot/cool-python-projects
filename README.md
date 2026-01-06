@@ -28,7 +28,7 @@ I keep adding new projects regularly – so stay tuned!
 ### ✅ 3. Dice Simulator
 - **Description:** Simulates rolling a dice.  
 - **Features:**  
-  - Random number generation from 1–6  
+  - Random number generation from 1 to 6  
   - Can roll multiple dice  
 
 ---
