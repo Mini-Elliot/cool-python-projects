@@ -5,6 +5,27 @@ import random
 
 LEADERBOARD_FILE = "leaderboard.json"
 
+# ----------- Levels ------------
+
+MAX_LEVEL = 50
+
+LEVELS = [
+    {
+        "upper": 50 + i * 25,
+        "attempts": 5 + (i // 10),
+        "hints": 5,
+        "domains": (
+            ["classic"] if i < 10 else
+            ["classic", "prime"] if i < 20 else
+            ["classic", "prime", "fibonacci"] if i < 30 else
+            ["prime", "fibonacci", "pi"] if i < 40 else
+            ["prime", "fibonacci", "pi", "e"]
+        )
+    }
+    for i in range(MAX_LEVEL)
+]
+
+
 
 # ---------- Utilities ----------
 
@@ -61,27 +82,27 @@ def pick_number(domain, upper):
 
 def hardcore_game():
     clear()
-    print("HARDCORE MODE — ONE LIFE\n")
+    print("HARDCORE MODE — 50 LEVELS — ONE LIFE\n")
 
     name = input("Enter your name: ").strip() or "Anonymous"
 
-    level = 1
-    upper = 50
-    attempts = 7
     total_guesses = 0
 
-    domains = ["prime", "fibonacci", "pi", "e", "classic"]
+    for level in range(1, MAX_LEVEL + 1):
+        config = LEVELS[level - 1]
+        upper = config["upper"]
+        attempts = config["attempts"]
+        hints_left = config["hints"]
+        domain = random.choice(config["domains"])
 
-    while True:
-        domain = random.choice(domains)
         secret = pick_number(domain, upper)
         low, high = 1, upper
 
-        print(f"\nLEVEL {level}")
+        print(f"\nLEVEL {level}/50")
         print(f"Domain: {domain.upper()}")
         print(f"Range: {low}–{high}")
         print(f"Attempts: {attempts}")
-        print("Hint: Optimal play uses binary search.")
+        print(f"Hints available: {hints_left}")
 
         used = []
 
@@ -97,20 +118,6 @@ def hardcore_game():
 
             if guess == secret:
                 print("Correct.")
-
-                # efficiency check
-                ideal = math.ceil(math.log2(high - low + 1))
-                if len(used) > ideal:
-                    print("You solved it, but inefficiently.")
-                else:
-                    print("Efficient solution.")
-
-                # adaptive difficulty
-                efficiency = ideal / len(used)
-                upper += int(upper * (0.3 + efficiency))
-                attempts = max(3, attempts - 1)
-
-                level += 1
                 break
 
             if guess < secret:
@@ -120,12 +127,18 @@ def hardcore_game():
                 print("Too high.")
                 high = min(high, guess - 1)
 
-            if len(used) >= 3:
+            if hints_left > 0:
                 mid = (low + high) // 2
-                print(f"Binary hint: midpoint ≈ {mid}")
+                print(f"HINT ({hints_left} left): midpoint ≈ {mid}")
+                hints_left -= 1
 
         else:
             return game_over(name, level)
+
+    print("\nYOU WON.")
+    print("All 50 levels completed.")
+    game_over(name, MAX_LEVEL)
+
 
 
 def game_over(name, level):
