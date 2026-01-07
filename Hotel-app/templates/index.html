@@ -89,6 +89,126 @@
             </div>
         </nav>
 
+        <!-- Login Modal -->
+        <div
+            class="modal fade"
+            id="loginModal"
+            tabindex="-1"
+            aria-labelledby="loginModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="/login">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="loginModalLabel">
+                                Login
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                            ></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    name="email"
+                                    placeholder="Email"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    name="password"
+                                    placeholder="Password"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">
+                                Login
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Modal -->
+        <div
+            class="modal fade"
+            id="registerModal"
+            tabindex="-1"
+            aria-labelledby="registerModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="/register">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="registerModalLabel">
+                                Register
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                            ></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="name"
+                                    placeholder="Full Name"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    name="email"
+                                    placeholder="Email"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    name="password"
+                                    placeholder="Password"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="phone"
+                                    placeholder="Phone Number"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">
+                                Register
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Hero Section -->
         <section class="hero" id="home">
             <div class="hero-content">
@@ -136,47 +256,107 @@
         <!-- Pricing Section -->
         <section id="pricing" class="bg-light">
             <div class="container">
-                <h2 class="section-title">Pricing</h2>
+                <h2 class="section-title text-center mb-5">Room & Pricing</h2>
+
+                <!-- Toggle Buttons -->
+                <div class="text-center mb-4">
+                    <div
+                        class="btn-group"
+                        role="group"
+                        aria-label="Pricing Toggle"
+                    >
+                        <input
+                            type="radio"
+                            class="btn-check"
+                            name="pricingToggle"
+                            id="perDay"
+                            autocomplete="off"
+                            checked
+                        />
+                        <label class="btn btn-outline-primary" for="perDay"
+                            >Per Day</label
+                        >
+
+                        <input
+                            type="radio"
+                            class="btn-check"
+                            name="pricingToggle"
+                            id="perWeek"
+                            autocomplete="off"
+                        />
+                        <label class="btn btn-outline-primary" for="perWeek"
+                            >Per Week</label
+                        >
+                    </div>
+                </div>
+
+                <!-- Pricing Cards -->
                 <div class="row text-center">
+                    <!-- Executive Room -->
                     <div class="col-md-4 mb-4">
                         <div class="card shadow h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Standard Room</h5>
+                                <h5 class="card-title">Executive Room</h5>
                                 <p class="card-text">
-                                    Comfortable rooms with all essential
-                                    amenities.
+                                    1 King bed, free Wi-Fi, smart TV,
+                                    air-conditioning, city view.
                                 </p>
-                                <h3>$100/night</h3>
+                                <h3
+                                    class="price"
+                                    data-daily="120"
+                                    data-weekly="720"
+                                >
+                                    $120
+                                </h3>
+                                <p class="text-muted">per night</p>
                                 <a href="/register" class="btn btn-primary mt-3"
                                     >Book Now</a
                                 >
                             </div>
                         </div>
                     </div>
+
+                    <!-- Deluxe Room -->
                     <div class="col-md-4 mb-4">
                         <div class="card shadow h-100">
                             <div class="card-body">
                                 <h5 class="card-title">Deluxe Room</h5>
                                 <p class="card-text">
-                                    Spacious rooms with premium services and
-                                    views.
+                                    1 King or 2 Queen beds, high-speed Wi-Fi,
+                                    minibar, balcony with city or pool view.
                                 </p>
-                                <h3>$200/night</h3>
+                                <h3
+                                    class="price"
+                                    data-daily="200"
+                                    data-weekly="1200"
+                                >
+                                    $200
+                                </h3>
+                                <p class="text-muted">per night</p>
                                 <a href="/register" class="btn btn-primary mt-3"
                                     >Book Now</a
                                 >
                             </div>
                         </div>
                     </div>
+
+                    <!-- Presidential Suite -->
                     <div class="col-md-4 mb-4">
                         <div class="card shadow h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Suite</h5>
+                                <h5 class="card-title">Presidential Suite</h5>
                                 <p class="card-text">
-                                    Ultimate luxury and privacy with exclusive
-                                    services.
+                                    2 Bedrooms, living area, kitchenette,
+                                    Jacuzzi, private terrace, VIP services.
                                 </p>
-                                <h3>$350/night</h3>
+                                <h3
+                                    class="price"
+                                    data-daily="450"
+                                    data-weekly="2700"
+                                >
+                                    $450
+                                </h3>
+                                <p class="text-muted">per night</p>
                                 <a href="/register" class="btn btn-primary mt-3"
                                     >Book Now</a
                                 >
@@ -185,6 +365,26 @@
                     </div>
                 </div>
             </div>
+
+            <!-- JavaScript for Toggle -->
+            <script>
+                const toggleButtons = document.querySelectorAll(
+                    'input[name="pricingToggle"]'
+                );
+                const prices = document.querySelectorAll(".price");
+                const labels = document.querySelectorAll(".price + p");
+
+                toggleButtons.forEach((btn) => {
+                    btn.addEventListener("change", () => {
+                        const mode = btn.id === "perDay" ? "daily" : "weekly";
+                        prices.forEach((price, index) => {
+                            price.textContent = `$${price.dataset[mode]}`;
+                            labels[index].textContent =
+                                mode === "daily" ? "per night" : "per week";
+                        });
+                    });
+                });
+            </script>
         </section>
 
         <!-- Blogs Section -->
