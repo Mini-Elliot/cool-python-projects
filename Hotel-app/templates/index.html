@@ -64,19 +64,19 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#home">Home</a>
+                            <a class="nav-link active" href="/">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#about">About</a>
+                            <a class="nav-link" href="/about">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#pricing">Pricing</a>
+                            <a class="nav-link" href="/pricing">Pricing</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#blogs">Blogs</a>
+                            <a class="nav-link" href="/blogs">Blogs</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#contact">Contact</a>
+                            <a class="nav-link" href="/contact">Contact</a>
                         </li>
                     </ul>
                     <div class="d-flex ms-lg-3">
@@ -89,126 +89,6 @@
             </div>
         </nav>
 
-        <!-- Login Modal -->
-        <div
-            class="modal fade"
-            id="loginModal"
-            tabindex="-1"
-            aria-labelledby="loginModalLabel"
-            aria-hidden="true"
-        >
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form method="POST" action="/login">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="loginModalLabel">
-                                Login
-                            </h5>
-                            <button
-                                type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal"
-                            ></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <input
-                                    type="email"
-                                    class="form-control"
-                                    name="email"
-                                    placeholder="Email"
-                                    required
-                                />
-                            </div>
-                            <div class="mb-3">
-                                <input
-                                    type="password"
-                                    class="form-control"
-                                    name="password"
-                                    placeholder="Password"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">
-                                Login
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Register Modal -->
-        <div
-            class="modal fade"
-            id="registerModal"
-            tabindex="-1"
-            aria-labelledby="registerModalLabel"
-            aria-hidden="true"
-        >
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form method="POST" action="/register">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="registerModalLabel">
-                                Register
-                            </h5>
-                            <button
-                                type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal"
-                            ></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    name="name"
-                                    placeholder="Full Name"
-                                    required
-                                />
-                            </div>
-                            <div class="mb-3">
-                                <input
-                                    type="email"
-                                    class="form-control"
-                                    name="email"
-                                    placeholder="Email"
-                                    required
-                                />
-                            </div>
-                            <div class="mb-3">
-                                <input
-                                    type="password"
-                                    class="form-control"
-                                    name="password"
-                                    placeholder="Password"
-                                    required
-                                />
-                            </div>
-                            <div class="mb-3">
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    name="phone"
-                                    placeholder="Phone Number"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">
-                                Register
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
         <!-- Hero Section -->
         <section class="hero" id="home">
             <div class="hero-content">
@@ -217,7 +97,7 @@
                     Experience luxury, comfort, and personalized hospitality
                     like never before.
                 </p>
-                <a href="#about" class="btn btn-primary btn-lg"
+                <a href="/about" class="btn btn-primary btn-lg"
                     >Discover More</a
                 >
             </div>

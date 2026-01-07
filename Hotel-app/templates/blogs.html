@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Blog | EAH</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="/">EAH</a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/pricing">Pricing</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/blogs">Blogs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contact">Contact</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex ms-lg-3">
+                        <a href="/login" class="btn btn-outline-light me-2"
+                            >Login</a
+                        >
+                        <a href="/register" class="btn btn-primary">Register</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <section class="py-5 bg-light">
+            <div class="container text-center">
+                <h1 class="fw-bold mb-3">EAH Blog</h1>
+                <p class="lead text-muted mx-auto" style="max-width: 760px">
+                    Insights on hotel management systems, backend architecture,
+                    security practices, and scalable web applications.
+                </p>
+            </div>
+        </section>
+
+        <!-- Blog List -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <!-- Blog Card -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="fw-bold">
+                                    Designing a Scalable Hotel Management System
+                                </h5>
+                                <p class="text-muted small mb-2">
+                                    Backend Architecture • Flask • MySQL
+                                </p>
+                                <p class="text-muted">
+                                    A breakdown of how to structure a hotel
+                                    management system that can grow from a demo
+                                    project to a production-ready application.
+                                </p>
+                                <a
+                                    href="#"
+                                    class="text-decoration-none fw-semibold"
+                                >
+                                    Read more →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blog Card -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="fw-bold">
+                                    Authentication Best Practices in Flask
+                                </h5>
+                                <p class="text-muted small mb-2">
+                                    Security • Sessions • Hashing
+                                </p>
+                                <p class="text-muted">
+                                    Common mistakes developers make when
+                                    implementing login systems and how to avoid
+                                    them using Flask and MySQL.
+                                </p>
+                                <a
+                                    href="#"
+                                    class="text-decoration-none fw-semibold"
+                                >
+                                    Read more →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blog Card -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="fw-bold">
+                                    From Static Pages to Dynamic Dashboards
+                                </h5>
+                                <p class="text-muted small mb-2">
+                                    UI/UX • Bootstrap • Jinja
+                                </p>
+                                <p class="text-muted">
+                                    How to transition a static landing page into
+                                    a role-based dashboard while maintaining
+                                    clean UI and readable templates.
+                                </p>
+                                <a
+                                    href="#"
+                                    class="text-decoration-none fw-semibold"
+                                >
+                                    Read more →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-light py-4">
+            <div class="container text-center">
+                <p class="mb-1 fw-bold">EAH — Elliot Alderson’s Hotel</p>
+                <p class="mb-0 text-muted">
+                    Articles focused on real-world backend and system design
+                    concepts.
+                </p>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

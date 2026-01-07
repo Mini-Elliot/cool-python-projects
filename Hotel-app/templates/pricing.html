@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Pricing | EAH</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+
+        <style>
+            .price {
+                font-size: 2.2rem;
+                font-weight: 700;
+            }
+            .toggle-btns .btn {
+                min-width: 120px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="/">EAH</a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/pricing"
+                                >Pricing</a
+                            >
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blogs">Blogs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contact">Contact</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex ms-lg-3">
+                        <a href="/login" class="btn btn-outline-light me-2"
+                            >Login</a
+                        >
+                        <a href="/register" class="btn btn-primary">Register</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Header -->
+        <section class="py-5 bg-light">
+            <div class="container text-center">
+                <h1 class="fw-bold mb-3">Room Pricing</h1>
+                <p class="lead text-muted mx-auto" style="max-width: 720px">
+                    Transparent pricing with no hidden fees. Switch between
+                    daily and weekly rates to plan your stay.
+                </p>
+
+                <div class="toggle-btns mt-4">
+                    <button
+                        class="btn btn-primary me-2"
+                        onclick="setPricing('day')"
+                    >
+                        Per Day
+                    </button>
+                    <button
+                        class="btn btn-outline-primary"
+                        onclick="setPricing('week')"
+                    >
+                        Per Week
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Cards -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row text-center">
+                    <!-- Standard -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="fw-bold">Standard Room</h5>
+                                <p class="text-muted">
+                                    Ideal for short stays and business
+                                    travelers.
+                                </p>
+                                <div
+                                    class="price"
+                                    data-day="120"
+                                    data-week="750"
+                                >
+                                    $120
+                                </div>
+                                <p class="text-muted mb-3" id="label-1">
+                                    per night
+                                </p>
+
+                                <ul class="list-unstyled text-start mb-4">
+                                    <li>✔ Free Wi-Fi</li>
+                                    <li>✔ Daily housekeeping</li>
+                                    <li>✔ Air conditioning</li>
+                                </ul>
+
+                                <a
+                                    href="/register"
+                                    class="btn btn-primary w-100"
+                                >
+                                    Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deluxe -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm border-primary">
+                            <div class="card-body">
+                                <h5 class="fw-bold">Deluxe Room</h5>
+                                <p class="text-muted">
+                                    Extra space and enhanced comfort.
+                                </p>
+                                <div
+                                    class="price"
+                                    data-day="200"
+                                    data-week="1250"
+                                >
+                                    $200
+                                </div>
+                                <p class="text-muted mb-3" id="label-2">
+                                    per night
+                                </p>
+
+                                <ul class="list-unstyled text-start mb-4">
+                                    <li>✔ City view</li>
+                                    <li>✔ Premium bedding</li>
+                                    <li>✔ Complimentary breakfast</li>
+                                </ul>
+
+                                <a
+                                    href="/register"
+                                    class="btn btn-primary w-100"
+                                >
+                                    Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suite -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="fw-bold">Executive Suite</h5>
+                                <p class="text-muted">
+                                    Designed for extended stays and executives.
+                                </p>
+                                <div
+                                    class="price"
+                                    data-day="350"
+                                    data-week="2200"
+                                >
+                                    $350
+                                </div>
+                                <p class="text-muted mb-3" id="label-3">
+                                    per night
+                                </p>
+
+                                <ul class="list-unstyled text-start mb-4">
+                                    <li>✔ Separate living area</li>
+                                    <li>✔ Priority support</li>
+                                    <li>✔ Late checkout</li>
+                                </ul>
+
+                                <a
+                                    href="/register"
+                                    class="btn btn-primary w-100"
+                                >
+                                    Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-light py-4">
+            <div class="container text-center">
+                <p class="mb-1 fw-bold">EAH — Elliot Alderson’s Hotel</p>
+                <p class="mb-0 text-muted">
+                    Pricing shown for demonstration purposes in this portfolio
+                    project.
+                </p>
+            </div>
+        </footer>
+
+        <script>
+            function setPricing(type) {
+                const prices = document.querySelectorAll(".price");
+                const labels = document.querySelectorAll("[id^='label']");
+
+                prices.forEach((price) => {
+                    const value =
+                        type === "day" ? price.dataset.day : price.dataset.week;
+                    price.textContent = `$${value}`;
+                });
+
+                labels.forEach((label) => {
+                    label.textContent =
+                        type === "day" ? "per night" : "per week";
+                });
+            }
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

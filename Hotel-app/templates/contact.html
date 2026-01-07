@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>About Us | EAH</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <!-- Navigation (reuse same navbar across pages) -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="/">EAH</a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/pricing">Pricing</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blogs">Blogs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/contact"
+                                >Contact</a
+                            >
+                        </li>
+                    </ul>
+                    <div class="d-flex ms-lg-3">
+                        <a href="/login" class="btn btn-outline-light me-2"
+                            >Login</a
+                        >
+                        <a href="/register" class="btn btn-primary">Register</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <section class="py-5 bg-light">
+            <div class="container text-center">
+                <h1 class="fw-bold mb-3">Get in Touch</h1>
+                <p class="lead text-muted mx-auto" style="max-width: 720px">
+                    Have a question about EAH, pricing, or implementation
+                    details? Use the form below and we’ll get back to you.
+                </p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <!-- Form -->
+                    <div class="col-md-7 mb-4 mb-md-0">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-4">
+                                <h4 class="fw-bold mb-3">Send a Message</h4>
+
+                                <form method="post" action="/contact">
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                            >Full Name</label
+                                        >
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            name="name"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                            >Email Address</label
+                                        >
+                                        <input
+                                            type="email"
+                                            class="form-control"
+                                            name="email"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                            >Message</label
+                                        >
+                                        <textarea
+                                            class="form-control"
+                                            name="message"
+                                            rows="5"
+                                            required
+                                        ></textarea>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-primary"
+                                    >
+                                        Send Message
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="col-md-5">
+                        <div class="p-4 bg-light rounded h-100">
+                            <h4 class="fw-bold mb-3">Contact Information</h4>
+                            <p class="text-muted">
+                                This project is a demo hotel management platform
+                                built to showcase backend architecture,
+                                authentication, and scalable UI design.
+                            </p>
+
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <strong>Email:</strong> support@eah-demo.com
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Availability:</strong> Mon–Fri,
+                                    9am–6pm
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Response Time:</strong> Within 24
+                                    hours
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-light py-4">
+            <div class="container text-center">
+                <p class="mb-1 fw-bold">EAH — Elliot Alderson’s Hotel</p>
+                <p class="mb-0 text-muted">
+                    Demo project built with Flask, MySQL, and Bootstrap.
+                </p>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
