@@ -2,63 +2,324 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>Hotel Management</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Elliot Alderson's Hotel (EAH)</title>
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
         />
+        <style>
+            /* General Styling */
+            body {
+                scroll-behavior: smooth;
+            }
+            .hero {
+                background: url("https://source.unsplash.com/1600x700/?hotel,luxury")
+                    center/cover no-repeat;
+                color: white;
+                padding: 140px 20px;
+                text-align: center;
+                position: relative;
+            }
+            .hero::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+            }
+            .hero-content {
+                position: relative;
+                z-index: 1;
+            }
+            section {
+                padding: 80px 20px;
+            }
+            .section-title {
+                margin-bottom: 40px;
+                text-align: center;
+            }
+            footer {
+                background: #212529;
+                color: #fff;
+                padding: 40px 0;
+            }
+        </style>
     </head>
     <body>
-        <div class="container mt-4">
-            <h1 class="mb-3">Hotels</h1>
-
-            <div class="mb-3">
-                <form method="get">
-                    <label>Sort by:</label>
-                    <select
-                        name="sort"
-                        onchange="this.form.submit()"
-                        class="form-select w-auto d-inline-block"
-                    >
-                        <option value="name">Name</option>
-                        <option value="rating">Rating</option>
-                        <option value="room">Room Available</option>
-                    </select>
-
-                    <label class="ms-3">Filter by Location:</label>
-                    <input
-                        type="text"
-                        name="location"
-                        placeholder="City"
-                        class="form-control w-auto d-inline-block"
-                        onchange="this.form.submit()"
-                    />
-                </form>
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="#">EAH</a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#pricing">Pricing</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#blogs">Blogs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#contact">Contact</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex ms-lg-3">
+                        <a href="/login" class="btn btn-outline-light me-2"
+                            >Login</a
+                        >
+                        <a href="/register" class="btn btn-primary">Register</a>
+                    </div>
+                </div>
             </div>
+        </nav>
 
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Rooms Available</th>
-                        <th>Location</th>
-                        <th>Rating</th>
-                        <th>Price per Room</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for hotel in hotels %}
-                    <tr>
-                        <td>{{ hotel.name }}</td>
-                        <td>{{ hotel.roomAvl }}</td>
-                        <td>{{ hotel.location }}</td>
-                        <td>{{ hotel.rating }}</td>
-                        <td>{{ hotel.pricePr }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <a href="/users" class="btn btn-primary mt-3">View Users</a>
-        </div>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1 class="display-3 fw-bold">Elliot Alderson's Hotel (EAH)</h1>
+                <p class="lead mb-4">
+                    Experience luxury, comfort, and personalized hospitality
+                    like never before.
+                </p>
+                <a href="#about" class="btn btn-primary btn-lg"
+                    >Discover More</a
+                >
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about">
+            <div class="container">
+                <h2 class="section-title">About Us</h2>
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p>
+                            At Elliot Alderson's Hotel, we redefine luxury stays
+                            with exceptional services, beautiful interiors, and
+                            a welcoming atmosphere. Our commitment is to make
+                            every guest's stay memorable and unique.
+                        </p>
+                        <ul>
+                            <li>Luxurious rooms and suites</li>
+                            <li>World-class dining options</li>
+                            <li>Central locations with easy access</li>
+                            <li>Personalized guest services</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <img
+                            src="https://source.unsplash.com/700x500/?hotel,lobby"
+                            class="img-fluid rounded shadow"
+                            alt="Hotel Image"
+                        />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="bg-light">
+            <div class="container">
+                <h2 class="section-title">Pricing</h2>
+                <div class="row text-center">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Standard Room</h5>
+                                <p class="card-text">
+                                    Comfortable rooms with all essential
+                                    amenities.
+                                </p>
+                                <h3>$100/night</h3>
+                                <a href="/register" class="btn btn-primary mt-3"
+                                    >Book Now</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Deluxe Room</h5>
+                                <p class="card-text">
+                                    Spacious rooms with premium services and
+                                    views.
+                                </p>
+                                <h3>$200/night</h3>
+                                <a href="/register" class="btn btn-primary mt-3"
+                                    >Book Now</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Suite</h5>
+                                <p class="card-text">
+                                    Ultimate luxury and privacy with exclusive
+                                    services.
+                                </p>
+                                <h3>$350/night</h3>
+                                <a href="/register" class="btn btn-primary mt-3"
+                                    >Book Now</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blogs Section -->
+        <section id="blogs">
+            <div class="container">
+                <h2 class="section-title">Latest Blogs</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <img
+                                src="https://source.unsplash.com/400x250/?travel,hotel"
+                                class="card-img-top"
+                                alt="Blog 1"
+                            />
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    5 Tips for a Luxurious Stay
+                                </h5>
+                                <p class="card-text">
+                                    Discover how to get the most comfort and
+                                    relaxation during your hotel stay.
+                                </p>
+                                <a href="#" class="btn btn-outline-primary"
+                                    >Read More</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <img
+                                src="https://source.unsplash.com/400x250/?hotel,restaurant"
+                                class="card-img-top"
+                                alt="Blog 2"
+                            />
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Top Dining Experiences
+                                </h5>
+                                <p class="card-text">
+                                    Explore the best dining options available in
+                                    luxury hotels.
+                                </p>
+                                <a href="#" class="btn btn-outline-primary"
+                                    >Read More</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow h-100">
+                            <img
+                                src="https://source.unsplash.com/400x250/?hotel,spa"
+                                class="card-img-top"
+                                alt="Blog 3"
+                            />
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Relaxation & Wellness
+                                </h5>
+                                <p class="card-text">
+                                    How to enjoy spa, wellness, and leisure
+                                    facilities to the fullest.
+                                </p>
+                                <a href="#" class="btn btn-outline-primary"
+                                    >Read More</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="bg-light">
+            <div class="container">
+                <h2 class="section-title">Contact Us</h2>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <h5>Get in Touch</h5>
+                        <p>Email: info@eahotel.com</p>
+                        <p>Phone: +1 234 567 890</p>
+                        <p>Address: 123 Luxury St, Cityville</p>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <form>
+                            <div class="mb-3">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="Your Name"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    placeholder="Your Email"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <textarea
+                                    class="form-control"
+                                    placeholder="Your Message"
+                                    rows="4"
+                                    required
+                                ></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center">
+            <div class="container">
+                <p>
+                    &copy; 2026 Elliot Alderson's Hotel (EAH). All rights
+                    reserved.
+                </p>
+                <div>
+                    <a href="#" class="text-white me-3">Facebook</a>
+                    <a href="#" class="text-white me-3">Twitter</a>
+                    <a href="#" class="text-white">Instagram</a>
+                </div>
+            </div>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
