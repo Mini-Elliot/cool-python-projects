@@ -30,7 +30,27 @@
                                             Sign up
                                         </p>
 
-                                        <form class="mx-1 mx-md-4">
+                                        <form
+                                            class="mx-1 mx-md-4"
+                                            action="{{ url_for('register') }}"
+                                            method="post"
+                                        >
+                                            <!-- show flash messages -->
+                                            {% with messages =
+                                            get_flashed_messages(with_categories=true)
+                                            %} {% if messages %}
+                                            <div>
+                                                {% for category, msg in messages
+                                                %}
+                                                <div
+                                                    class="alert alert-{{ category }} py-1"
+                                                >
+                                                    {{ msg }}
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %} {% endwith %}
+
                                             <div
                                                 class="d-flex flex-row align-items-center mb-4"
                                             >
@@ -43,8 +63,10 @@
                                                 >
                                                     <input
                                                         type="text"
+                                                        name="username"
                                                         id="form3Example1c"
                                                         class="form-control"
+                                                        required
                                                     />
                                                     <label
                                                         class="form-label"
@@ -66,8 +88,10 @@
                                                 >
                                                     <input
                                                         type="email"
+                                                        name="email"
                                                         id="form3Example3c"
                                                         class="form-control"
+                                                        required
                                                     />
                                                     <label
                                                         class="form-label"
@@ -89,8 +113,10 @@
                                                 >
                                                     <input
                                                         type="password"
+                                                        name="password"
                                                         id="form3Example4c"
                                                         class="form-control"
+                                                        required
                                                     />
                                                     <label
                                                         class="form-label"
@@ -112,8 +138,10 @@
                                                 >
                                                     <input
                                                         type="password"
+                                                        name="password2"
                                                         id="form3Example4cd"
                                                         class="form-control"
+                                                        required
                                                     />
                                                     <label
                                                         class="form-label"
@@ -122,6 +150,33 @@
                                                         password</label
                                                     >
                                                 </div>
+                                            </div>
+
+                                            <!-- role selector (for testing/demo). In production restrict role assignment -->
+                                            <div class="mb-3 text-center">
+                                                <label
+                                                    for="role"
+                                                    class="form-label"
+                                                    >Role</label
+                                                >
+                                                <select
+                                                    name="role"
+                                                    id="role"
+                                                    class="form-select w-50 mx-auto"
+                                                >
+                                                    <option
+                                                        value="user"
+                                                        selected
+                                                    >
+                                                        User
+                                                    </option>
+                                                    <option value="moderator">
+                                                        Moderator
+                                                    </option>
+                                                    <option value="admin">
+                                                        Admin
+                                                    </option>
+                                                </select>
                                             </div>
 
                                             <div
@@ -148,9 +203,7 @@
                                                 class="d-flex justify-content-center mx-4 mb-3 mb-lg-4"
                                             >
                                                 <button
-                                                    type="button"
-                                                    data-mdb-button-init
-                                                    data-mdb-ripple-init
+                                                    type="submit"
                                                     class="btn btn-primary btn-lg"
                                                 >
                                                     Register

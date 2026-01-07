@@ -1,40 +1,79 @@
-from flask import Flask, render_template, request, redirect, session
-from models import Hotel, User
-import hashlib
-import mysql.connector
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    login_required,
+    current_user,
+    logout_user,
+)
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+import os
 
 app = Flask(__name__)
-app.config.from_object('config')
-app.secret_key = "dev_secret_key"  # move to env later
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret")
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# ---------------- DB (MySQL) ----------------
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="",
-    database="hotel_app"
-)
-cursor = db.cursor(dictionary=True)
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
 
-# ---------------- Sample Data (TEMP) ----------------
-hotels = [
-    Hotel("Elliot Alderson Executive", 4, "Bangalore", 5, 120),
-    Hotel("EAH Deluxe Room", 5, "Bangalore", 5, 200),
-    Hotel("EAH Presidential Suite", 6, "Mumbai", 3, 450),
-]
 
-users = [
-    User("Zubair", 2, 1000),
-    User("Elliot", 3, 1200),
-    User("Alice", 4, 1100),
-]
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+    role = db.Column(db.String(30), default="user")  # admin / moderator / user
 
-# ---------------- Public Pages ----------------
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+def role_required(*roles):
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if not current_user.is_authenticated:
+                return login_manager.unauthorized()
+            if current_user.role not in roles:
+                flash("You do not have permission to access this page.", "warning")
+                return redirect(url_for("dashboard"))
+            return f(*args, **kwargs)
+        return wrapped
+    return decorator
+
+
+# Replace the decorated function with a normal function that runs inside app context
+def create_tables():
+    with app.app_context():
+        db.create_all()
+        # create a default admin if none exists (password: admin)
+        if not User.query.filter_by(email="admin@example.com").first():
+            admin = User(username="admin", email="admin@example.com", role="admin")
+            admin.set_password("admin")
+            db.session.add(admin)
+            db.session.commit()
+
+
 @app.route("/")
 def index():
-    return render_template("index.html")
+    # serve public home page
+    return render_template("home.html")
 
 
+# Public routes (no login required)
 @app.route("/about")
 def about():
     return render_template("about.html")
@@ -47,81 +86,51 @@ def pricing():
 
 @app.route("/blogs")
 def blogs():
+    # list of public blog entries could be passed here
     return render_template("blogs.html")
 
 
-@app.route("/contact")
+@app.route("/contact", methods=["GET", "POST"])
 def contact():
+    if request.method == "POST":
+        # ... handle contact form submission (store/email) ...
+        flash("Message received. We'll get back to you.", "success")
+        return redirect(url_for("contact"))
     return render_template("contact.html")
 
 
-# ---------------- Authentication ----------------
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
-        password = hashlib.sha256(
-            request.form["password"].encode()
-        ).hexdigest()
-
-        cursor.execute(
-            "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
-            (name, email, password)
-        )
-        db.commit()
-
-        return redirect("/login")
-
-    return render_template("register.html")
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        email = request.form["email"]
-        password = hashlib.sha256(
-            request.form["password"].encode()
-        ).hexdigest()
-
-        cursor.execute(
-            "SELECT * FROM users WHERE email=%s AND password=%s",
-            (email, password)
-        )
-        user = cursor.fetchone()
-
-        if user:
-            session["user_id"] = user["id"]
-            session["user_name"] = user["name"]
-            return redirect("/dashboard")
-
-        return render_template("login.html", error="Invalid credentials")
-
-    return render_template("login.html")
-
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/")
-
-
-# ---------------- Protected ----------------
+# Protected routes (require login)
 @app.route("/dashboard")
+@login_required
 def dashboard():
-    if "user_id" not in session:
-        return redirect("/login")
-
-    return render_template(
-        "dashboard.html",
-        user=session["user_name"]
-    )
+    return render_template("dashboard.html")
 
 
-# ---------------- Demo Users Page ----------------
-@app.route("/users")
-def show_users():
-    return render_template("users.html", users=users, hotels=hotels)
+@app.route("/blog/create", methods=["GET", "POST"])
+@login_required
+def create_blog():
+    if request.method == "POST":
+        # ...create blog logic...
+        flash("Blog post created.", "success")
+        return redirect(url_for("blogs"))
+    return render_template("create_blog.html")
+
+
+@app.route("/booking", methods=["GET", "POST"])
+@login_required
+def book_hotel():
+    if request.method == "POST":
+        # ...booking logic...
+        flash("Booking confirmed.", "success")
+        return redirect(url_for("dashboard"))
+    return render_template("booking.html")
+
+
+@app.route("/manage")
+@login_required
+@role_required("admin")
+def manage_site():
+    return render_template("manage.html")
 
 
 # ---------------- Errors ----------------
@@ -131,4 +140,6 @@ def page_not_found(e):
 
 
 if __name__ == "__main__":
+    # ensure DB/tables/default admin exist before serving
+    create_tables()
     app.run(debug=True)
