@@ -69,8 +69,7 @@ def create_tables():
 
 @app.route("/")
 def index():
-    # serve public home page
-    return render_template("home.html")
+    return render_template("index.html")
 
 
 # Public routes (no login required)
