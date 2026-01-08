@@ -1,0 +1,22 @@
+{% extends "layout.html" %} {% block title %}{{ post.title }} — EAH Blog{%
+endblock %} {% block content %}
+<article class="my-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="fw-bold">{{ post.title }}</h1>
+            <p class="text-muted small">
+                By {{ post.author }} — {{ post.date }}
+            </p>
+            <img
+                src="{{ post.image }}"
+                class="img-fluid rounded mb-4"
+                alt="{{ post.title }}"
+            />
+            <div class="post-content">{{ post.content }}</div>
+            <a href="{{ url_for('index') }}" class="btn btn-link mt-3"
+                >&larr; Back to posts</a
+            >
+        </div>
+    </div>
+</article>
+{% endblock %}

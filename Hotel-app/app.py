@@ -1,144 +1,99 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import (
-    LoginManager,
-    UserMixin,
-    login_user,
-    login_required,
-    current_user,
-    logout_user,
-)
-from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
+from werkzeug.security import generate_password_hash
+from datetime import datetime
 import os
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret")
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['SECRET_KEY'] = 'dev-secret'
+# sqlite DB file placed next to app.py
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-login_manager = LoginManager(app)
-login_manager.login_view = "login"
 
-
-class User(UserMixin, db.Model):
+# Models
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
-    role = db.Column(db.String(30), default="user")  # admin / moderator / user
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(120), nullable=True)
+    is_admin = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+# Minimal posts so templates render
+posts = [
+    {
+        "id": 1,
+        "slug": "luxury-checklist",
+        "title": "5 Tips for a Luxurious Stay",
+        "author": "Elliot Alderson",
+        "date": "2026-01-01",
+        "excerpt": "Discover how to get the most comfort and relaxation during your hotel stay.",
+        "image": "https://source.unsplash.com/900x400/?luxury,hotel",
+        "content": "<p>Plan ahead, request upgrades, use hotel amenities, and be polite to staff.</p><p>Small touches make a big difference.</p>",
+    },
+    {
+        "id": 2,
+        "slug": "top-dining-experiences",
+        "title": "Top Dining Experiences",
+        "author": "Elliot Alderson",
+        "date": "2026-02-10",
+        "excerpt": "Explore the best dining options available in luxury hotels.",
+        "image": "https://source.unsplash.com/900x400/?hotel,restaurant",
+        "content": "<p>From signature tasting menus to in-room dining—discover what makes dining memorable.</p>",
+    },
+]
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+# Helper to create admin user
+def create_admin(email: str, password: str, name: str = "Admin"):
+    if not email or not password:
+        return False
+    existing = User.query.filter_by(email=email).first()
+    if existing:
+        return False
+    u = User(
+        email=email,
+        password_hash=generate_password_hash(password),
+        name=name,
+        is_admin=True,
+    )
+    db.session.add(u)
+    db.session.commit()
+    return True
 
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
-def role_required(*roles):
-    def decorator(f):
-        @wraps(f)
-        def wrapped(*args, **kwargs):
-            if not current_user.is_authenticated:
-                return login_manager.unauthorized()
-            if current_user.role not in roles:
-                flash("You do not have permission to access this page.", "warning")
-                return redirect(url_for("dashboard"))
-            return f(*args, **kwargs)
-        return wrapped
-    return decorator
-
-
-# Replace the decorated function with a normal function that runs inside app context
-def create_tables():
-    with app.app_context():
-        db.create_all()
-        # create a default admin if none exists (password: admin)
-        if not User.query.filter_by(email="admin@example.com").first():
-            admin = User(username="admin", email="admin@example.com", role="admin")
-            admin.set_password("admin")
-            db.session.add(admin)
-            db.session.commit()
-
-
+# Routes
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", posts=posts)
 
+@app.route("/post/<slug>")
+def post_detail(slug):
+    post = next((p for p in posts if p["slug"] == slug), None)
+    if not post:
+        return "Post not found", 404
+    return render_template("post.html", post=post)
 
-# Public routes (no login required)
+# Contact/about placeholders to match templates if used
 @app.route("/about")
 def about():
     return render_template("about.html")
 
-
-@app.route("/pricing")
-def pricing():
-    return render_template("pricing.html")
-
-
-@app.route("/blogs")
-def blogs():
-    # list of public blog entries could be passed here
-    return render_template("blogs.html")
-
-
 @app.route("/contact", methods=["GET", "POST"])
 def contact():
     if request.method == "POST":
-        # ... handle contact form submission (store/email) ...
-        flash("Message received. We'll get back to you.", "success")
+        flash("Thanks for your message.", "success")
         return redirect(url_for("contact"))
     return render_template("contact.html")
 
-
-# Protected routes (require login)
-@app.route("/dashboard")
-@login_required
-def dashboard():
-    return render_template("dashboard.html")
-
-
-@app.route("/blog/create", methods=["GET", "POST"])
-@login_required
-def create_blog():
-    if request.method == "POST":
-        # ...create blog logic...
-        flash("Blog post created.", "success")
-        return redirect(url_for("blogs"))
-    return render_template("create_blog.html")
-
-
-@app.route("/booking", methods=["GET", "POST"])
-@login_required
-def book_hotel():
-    if request.method == "POST":
-        # ...booking logic...
-        flash("Booking confirmed.", "success")
-        return redirect(url_for("dashboard"))
-    return render_template("booking.html")
-
-
-@app.route("/manage")
-@login_required
-@role_required("admin")
-def manage_site():
-    return render_template("manage.html")
-
-
-# ---------------- Errors ----------------
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template("404.html"), 404
-
-
 if __name__ == "__main__":
-    # ensure DB/tables/default admin exist before serving
-    create_tables()
+    # Ensure DB operations run inside the Flask application context
+    with app.app_context():
+        db.create_all()
+        created = create_admin("walker90207@gmail.com", "PasSw0rd!", name="Admin")
+        if created:
+            print("Admin user created: walker90207@gmail.com")
+        else:
+            print("Admin user already exists or not created.")
     app.run(debug=True)

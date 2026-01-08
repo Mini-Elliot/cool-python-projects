@@ -58,7 +58,9 @@
         <!-- Navigation -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="#">EAH</a>
+                <a class="navbar-brand fw-bold" href="{{ url_for('index') }}"
+                    >EAH</a
+                >
                 <button
                     class="navbar-toggler"
                     type="button"
@@ -67,361 +69,288 @@
                 >
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {# Determine role: prefer user_role, else inspect
+                    current_user #} {% if user_role is defined %} {% set role =
+                    user_role %} {% elif current_user is defined and
+                    current_user.is_authenticated %} {% if current_user.is_admin
+                    %} {% set role = 'admin' %} {% else %} {% set role = 'user'
+                    %} {% endif %} {% else %} {% set role = 'guest' %} {% endif
+                    %} {% if role == 'admin' %}
+                    <!-- Admin Navigation -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" href="/">Home</a>
+                            <a class="nav-link" href="{{ url_for('index') }}"
+                                >Home</a
+                            >
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/about">About</a>
+                            <a class="nav-link" href="{{ url_for('about') }}"
+                                >About</a
+                            >
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/pricing">Pricing</a>
+                            <a
+                                class="nav-link"
+                                href="{{ url_for('post_list') if 'post_list' in globals() else url_for('index') }}"
+                            >
+                                Blogs
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/blogs">Blogs</a>
+                            <a
+                                class="nav-link"
+                                href="{{ url_for('admin_dashboard') }}"
+                                >Admin Dashboard</a
+                            >
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/contact">Contact</a>
+                            <a
+                                class="nav-link"
+                                href="{{ url_for('admin_posts') }}"
+                                >Manage Posts</a
+                            >
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="{{ url_for('admin_users') }}"
+                                >Users</a
+                            >
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a
+                                class="nav-link dropdown-toggle"
+                                href="#"
+                                id="adminMenu"
+                                role="button"
+                                data-bs-toggle="dropdown"
+                            >
+                                {{ current_user.name if current_user is defined
+                                else 'Admin' }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{{ url_for('admin_profile') }}"
+                                        >Profile</a
+                                    >
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider" />
+                                </li>
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{{ url_for('logout') }}"
+                                        >Logout</a
+                                    >
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    {% elif role == 'user' %}
+                    <!-- Logged-in User Navigation -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('index') }}"
+                                >Home</a
+                            >
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('about') }}"
+                                >About</a
+                            >
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="{{ url_for('post_list') if 'post_list' in globals() else url_for('index') }}"
+                            >
+                                Blogs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('contact') }}"
+                                >Contact</a
+                            >
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="{{ url_for('dashboard') }}"
+                                >Dashboard</a
+                            >
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a
+                                class="nav-link dropdown-toggle"
+                                href="#"
+                                id="userMenu"
+                                role="button"
+                                data-bs-toggle="dropdown"
+                            >
+                                {{ current_user.name if current_user is defined
+                                else 'User' }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{{ url_for('profile') }}"
+                                        >Profile</a
+                                    >
+                                </li>
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{{ url_for('my_posts') }}"
+                                        >My Posts</a
+                                    >
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider" />
+                                </li>
+                                <li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{{ url_for('logout') }}"
+                                        >Logout</a
+                                    >
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    {% else %}
+                    <!-- Guest Navigation -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a
+                                class="nav-link active"
+                                href="{{ url_for('index') }}"
+                                >Home</a
+                            >
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('about') }}"
+                                >About</a
+                            >
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('pricing') }}"
+                                >Pricing</a
+                            >
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="{{ url_for('post_list') if 'post_list' in globals() else url_for('index') }}"
+                            >
+                                Blogs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('contact') }}"
+                                >Contact</a
+                            >
                         </li>
                     </ul>
                     <div class="d-flex ms-lg-3">
-                        <a href="/login" class="btn btn-outline-light me-2"
+                        <a
+                            href="{{ url_for('login') }}"
+                            class="btn btn-outline-light me-2"
                             >Login</a
                         >
-                        <a href="/register" class="btn btn-primary">Register</a>
+                        <a
+                            href="{{ url_for('register') }}"
+                            class="btn btn-primary"
+                            >Register</a
+                        >
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </nav>
 
         <!-- Hero Section -->
-        <section class="hero" id="home" aria-labelledby="home-heading">
+        <section
+            class="hero text-light"
+            id="home"
+            aria-labelledby="home-heading"
+        >
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-lg-6">
-                        <h1
-                            id="home-heading"
-                            class="display-5 fw-bold text-light"
-                        >
-                            Find your perfect stay — comfort, clarity,
-                            confidence.
+                    <div class="col-lg-7">
+                        <h1 class="display-5 fw-bold">
+                            EAH Blog — Travel, Hospitality & Wellness
                         </h1>
-                        <p class="lead text-light mt-3">
-                            Book verified hotels, transparent pricing, and 24/7
-                            support. Fast reservations for leisure and business
-                            travelers.
+                        <p class="lead">
+                            Real-world tips, dining guides, and relaxation ideas
+                            from Elliot Alderson.
                         </p>
-                        <div class="mt-4">
-                            <a
-                                class="btn btn-primary btn-lg me-2"
-                                href="/pricing"
-                                role="button"
-                            >
-                                See Rooms & Pricing
-                            </a>
-                            <a
-                                class="btn btn-outline-light btn-lg"
-                                href="/contact"
-                                role="button"
-                            >
-                                Contact Sales
-                            </a>
-                        </div>
-                        <p class="text-muted small mt-3">
-                            Browse freely — create an account to manage
-                            bookings.
-                        </p>
+                        <a
+                            href="{{ url_for('about') }}"
+                            class="btn btn-outline-light btn-lg me-2"
+                        >
+                            About EAH
+                        </a>
+                        <a
+                            href="{{ url_for('contact') }}"
+                            class="btn btn-primary btn-lg"
+                        >
+                            Contact
+                        </a>
                     </div>
-                    <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                    <div class="col-lg-5 text-center">
                         <img
                             src="https://images.unsplash.com/photo-1501117716987-c8e0f5a1a79b?q=80&w=1200&auto=format&fit=crop"
-                            alt="Luxurious hotel room"
-                            class="img-fluid hero-image"
-                        />
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about">
-            <div class="container">
-                <h2 class="section-title">About Us</h2>
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <p>
-                            At Elliot Alderson's Hotel, we redefine luxury stays
-                            with exceptional services, beautiful interiors, and
-                            a welcoming atmosphere. Our commitment is to make
-                            every guest's stay memorable and unique.
-                        </p>
-                        <ul>
-                            <li>Luxurious rooms and suites</li>
-                            <li>World-class dining options</li>
-                            <li>Central locations with easy access</li>
-                            <li>Personalized guest services</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <img
-                            src="https://source.unsplash.com/700x500/?hotel,lobby"
                             class="img-fluid rounded shadow"
-                            alt="Hotel Image"
+                            alt="Hero"
                         />
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Pricing Section -->
-        <section id="pricing" class="bg-light">
+        <!-- Blog Posts Section -->
+        <section class="py-5">
             <div class="container">
-                <h2 class="section-title text-center mb-5">Room & Pricing</h2>
-
-                <!-- Toggle Buttons -->
-                <div class="text-center mb-4">
-                    <div
-                        class="btn-group"
-                        role="group"
-                        aria-label="Pricing Toggle"
-                    >
-                        <input
-                            type="radio"
-                            class="btn-check"
-                            name="pricingToggle"
-                            id="perDay"
-                            autocomplete="off"
-                            checked
-                        />
-                        <label class="btn btn-outline-primary" for="perDay"
-                            >Per Day</label
-                        >
-
-                        <input
-                            type="radio"
-                            class="btn-check"
-                            name="pricingToggle"
-                            id="perWeek"
-                            autocomplete="off"
-                        />
-                        <label class="btn btn-outline-primary" for="perWeek"
-                            >Per Week</label
-                        >
-                    </div>
-                </div>
-
-                <!-- Pricing Cards -->
-                <div class="row text-center">
-                    <!-- Executive Room -->
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Executive Room</h5>
-                                <p class="card-text">
-                                    1 King bed, free Wi-Fi, smart TV,
-                                    air-conditioning, city view.
-                                </p>
-                                <h3
-                                    class="price"
-                                    data-daily="120"
-                                    data-weekly="720"
-                                >
-                                    $120
-                                </h3>
-                                <p class="text-muted">per night</p>
-                                <a href="/register" class="btn btn-primary mt-3"
-                                    >Book Now</a
-                                >
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Deluxe Room -->
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Deluxe Room</h5>
-                                <p class="card-text">
-                                    1 King or 2 Queen beds, high-speed Wi-Fi,
-                                    minibar, balcony with city or pool view.
-                                </p>
-                                <h3
-                                    class="price"
-                                    data-daily="200"
-                                    data-weekly="1200"
-                                >
-                                    $200
-                                </h3>
-                                <p class="text-muted">per night</p>
-                                <a href="/register" class="btn btn-primary mt-3"
-                                    >Book Now</a
-                                >
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Presidential Suite -->
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Presidential Suite</h5>
-                                <p class="card-text">
-                                    2 Bedrooms, living area, kitchenette,
-                                    Jacuzzi, private terrace, VIP services.
-                                </p>
-                                <h3
-                                    class="price"
-                                    data-daily="450"
-                                    data-weekly="2700"
-                                >
-                                    $450
-                                </h3>
-                                <p class="text-muted">per night</p>
-                                <a href="/register" class="btn btn-primary mt-3"
-                                    >Book Now</a
-                                >
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- JavaScript for Toggle -->
-            <script>
-                const toggleButtons = document.querySelectorAll(
-                    'input[name="pricingToggle"]'
-                );
-                const prices = document.querySelectorAll(".price");
-                const labels = document.querySelectorAll(".price + p");
-
-                toggleButtons.forEach((btn) => {
-                    btn.addEventListener("change", () => {
-                        const mode = btn.id === "perDay" ? "daily" : "weekly";
-                        prices.forEach((price, index) => {
-                            price.textContent = `$${price.dataset[mode]}`;
-                            labels[index].textContent =
-                                mode === "daily" ? "per night" : "per week";
-                        });
-                    });
-                });
-            </script>
-        </section>
-
-        <!-- Blogs Section -->
-        <section id="blogs">
-            <div class="container">
-                <h2 class="section-title">Latest Blogs</h2>
+                <h2 class="mb-4">Latest Posts</h2>
                 <div class="row">
+                    {% for post in posts %}
                     <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
+                        <div class="card h-100 shadow">
                             <img
-                                src="https://source.unsplash.com/400x250/?travel,hotel"
+                                src="{{ post.image }}"
                                 class="card-img-top"
-                                alt="Blog 1"
+                                alt="{{ post.title }}"
                             />
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    5 Tips for a Luxurious Stay
-                                </h5>
-                                <p class="card-text">
-                                    Discover how to get the most comfort and
-                                    relaxation during your hotel stay.
-                                </p>
-                                <a href="#" class="btn btn-outline-primary"
-                                    >Read More</a
-                                >
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ post.title }}</h5>
+                                <p class="card-text">{{ post.excerpt }}</p>
+                                <div class="mt-auto">
+                                    <a
+                                        href="{{ url_for('post_detail', slug=post.slug) }}"
+                                        class="btn btn-primary"
+                                    >
+                                        Read More
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-footer text-muted small">
+                                By {{ post.author }} — {{ post.date }}
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
-                            <img
-                                src="https://source.unsplash.com/400x250/?hotel,restaurant"
-                                class="card-img-top"
-                                alt="Blog 2"
-                            />
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    Top Dining Experiences
-                                </h5>
-                                <p class="card-text">
-                                    Explore the best dining options available in
-                                    luxury hotels.
-                                </p>
-                                <a href="#" class="btn btn-outline-primary"
-                                    >Read More</a
-                                >
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow h-100">
-                            <img
-                                src="https://source.unsplash.com/400x250/?hotel,spa"
-                                class="card-img-top"
-                                alt="Blog 3"
-                            />
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    Relaxation & Wellness
-                                </h5>
-                                <p class="card-text">
-                                    How to enjoy spa, wellness, and leisure
-                                    facilities to the fullest.
-                                </p>
-                                <a href="#" class="btn btn-outline-primary"
-                                    >Read More</a
-                                >
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="bg-light">
-            <div class="container">
-                <h2 class="section-title">Contact Us</h2>
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <h5>Get in Touch</h5>
-                        <p>Email: info@eahotel.com</p>
-                        <p>Phone: +1 234 567 890</p>
-                        <p>Address: 123 Luxury St, Cityville</p>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <form>
-                            <div class="mb-3">
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    placeholder="Your Name"
-                                    required
-                                />
-                            </div>
-                            <div class="mb-3">
-                                <input
-                                    type="email"
-                                    class="form-control"
-                                    placeholder="Your Email"
-                                    required
-                                />
-                            </div>
-                            <div class="mb-3">
-                                <textarea
-                                    class="form-control"
-                                    placeholder="Your Message"
-                                    rows="4"
-                                    required
-                                ></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                Send Message
-                            </button>
-                        </form>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </section>
